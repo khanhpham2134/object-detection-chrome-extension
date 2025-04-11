@@ -1,0 +1,71 @@
+# Build output
+dist/
+build/
+
+# Node.js dependencies
+node_modules/
+
+# TensorFlow.js model cache
+.tensorcache/
+*_model_*/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Cache and temporary files
+.cache/
+.temp/
+.tmp/
+*.bak
+*.tmp
+*.swp
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Coverage reports
+coverage/
+
+# Debug files
+chrome-profiler-events*.json
+
+# Optional eslint cache
+.eslintcache
+
+# Thumbnails
+__image_snapshots__/
+
+# Package files
+*.tgz
+
+# Local configuration files
+config.local.js
+
+# Vite files
+.vite/
