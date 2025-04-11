@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Object Detection Extension",
+  "name": "Object Detection",
   "version": "1.0",
   "description": "Detects objects on screen using YOLO",
   "permissions": ["storage", "tabs"],

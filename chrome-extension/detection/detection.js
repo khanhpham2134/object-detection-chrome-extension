@@ -4,7 +4,7 @@
  */
 
 import { loadModel, loadClassNames, getModel, cleanupTensorflow } from './model.js';
-import { processFrame, findMatchingDetection, getDetectionInterval } from './detector.js';
+import { processFrame, findMatchingDetection, getDetectionInterval } from './detect.js';
 import { 
   createBoxElement, updateExistingBoxElement,
   updateDetectionStats, removeStats, showError, hideError,

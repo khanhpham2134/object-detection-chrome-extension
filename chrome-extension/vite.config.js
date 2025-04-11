@@ -8,7 +8,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         detection: resolve(__dirname, './detection/detection.js'),
-        popup: resolve(__dirname, './popup/popup.js'),
+        popup: resolve(__dirname, './popup.js'),
       },
       output: {
         entryFileNames: '[name].js',
