@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Object Detection Extension",
+  "version": "1.0",
+  "description": "Detects objects on screen using YOLO",
+  "permissions": ["storage", "tabs"],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "images/icon.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "host_permissions": ["*://*/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["dist/*", "yolo11n_web_model/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

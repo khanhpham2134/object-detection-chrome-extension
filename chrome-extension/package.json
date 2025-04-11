@@ -1,0 +1,18 @@
+{
+  "name": "object-detection-chrome-extension",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0"
+  },
+  "devDependencies": {
+    "terser": "^5.39.0",
+    "vite": "^5.4.18"
+  }
+}
