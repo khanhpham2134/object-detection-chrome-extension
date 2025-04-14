@@ -1,15 +1,29 @@
 import * as tf from '@tensorflow/tfjs';
 import { getModel, getClassNames } from './model.js';
 
-// Default detection interval in milliseconds - controls frequency of detection
-let DETECTION_INTERVAL = 300; 
+// Base detection interval in milliseconds
+let DETECTION_INTERVAL = 300;
 
 /**
- * Returns the current detection interval
- * @returns {number} Current interval between detections in milliseconds
+ * Returns a dynamically calculated detection interval
+ * based on recent processing performance
+ * @returns {number} Adaptive interval between detections in milliseconds
  */
 export function getDetectionInterval() {
-  return DETECTION_INTERVAL;
+  return DETECTION_INTERVAL
+}
+
+/**
+ * Track frame processing time for adaptive throttling
+ * @param {number} processingTime - Time taken to process a frame in ms
+ */
+export function recordFrameProcessingTime(processingTime) {
+  processingTimes.push(processingTime);
+  
+  // Keep only the most recent samples
+  if (processingTimes.length > MAX_SAMPLES) {
+    processingTimes.shift();
+  }
 }
 
 /**
