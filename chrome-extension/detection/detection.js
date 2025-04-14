@@ -20,6 +20,8 @@ let isDetectionRunning = false; // Flag indicating if detection loop is active
 let lastDetectionTime = 0;      // Timestamp of last detection for throttling
 let previousDetections = [];    // Previous frame's detections for tracking
 let wasRunningBeforeHidden = false; // Track if detection was running before tab became hidden
+let modelInferenceCount = 0; // Count of model inferences for performance tracking
+let lastModelCountTime = performance.now(); // Timestamp for last model FPS count
 
 /**
  * Initialize the application when DOM is fully loaded
@@ -210,6 +212,21 @@ async function detectionLoop(timestamp) {
     // Process current frame through TensorFlow model
     const { processedDetections, paddingInfo } = await processFrame(videoElement);
     
+    modelInferenceCount++;
+    const now = performance.now();
+    if (now - lastModelCountTime >= 1000) {
+      console.log("YOLO inference FPS:", modelInferenceCount);
+      
+      // Check if element exists before updating
+      const fpsElement = document.getElementById("modelFps");
+      if (fpsElement) {
+        fpsElement.textContent = `${modelInferenceCount} model FPS`;
+      }
+      
+      modelInferenceCount = 0;
+      lastModelCountTime = now;
+    }
+
     // Update UI with detection results
     updateDetectionBoxes(processedDetections, paddingInfo);
     
