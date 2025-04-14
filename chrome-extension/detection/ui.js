@@ -121,7 +121,7 @@ export function updateExistingBoxElement(boxElement, detection) {
   const { screenBox, score } = detection;
   const { x1, y1, width, height } = screenBox;
   
-  // Check if position or size has changed significantly (avoid minor jitter)
+  // Check if position or size has changed significantly 
   const currentX = parseFloat(boxElement.style.left);
   const currentY = parseFloat(boxElement.style.top);
   const currentWidth = parseFloat(boxElement.style.width);
