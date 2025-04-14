@@ -94,8 +94,8 @@ chrome-extension/
 ### Installation
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/yolo-chrome-extension.git
-   cd yolo-chrome-extension
+   git clone https://github.com/khanhpham2134/object-detection-chrome-extension.git
+   cd chrome-extension
    ```
 2. Install dependencies:
    ```bash
