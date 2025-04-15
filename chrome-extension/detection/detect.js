@@ -14,19 +14,6 @@ export function getDetectionInterval() {
 }
 
 /**
- * Track frame processing time for adaptive throttling
- * @param {number} processingTime - Time taken to process a frame in ms
- */
-export function recordFrameProcessingTime(processingTime) {
-  processingTimes.push(processingTime);
-  
-  // Keep only the most recent samples
-  if (processingTimes.length > MAX_SAMPLES) {
-    processingTimes.shift();
-  }
-}
-
-/**
  * Main detection function that processes a video frame and returns object detections
  * @param {HTMLVideoElement} videoElement - The video element to capture frames from
  * @returns {Object} Object containing processed detections and padding information
