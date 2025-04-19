@@ -4,12 +4,15 @@
  */
 
 import { loadModel, loadClassNames, getModel, cleanupTensorflow } from './model.js';
-import { processFrame, findMatchingDetection, getDetectionInterval } from './detect.js';
+import { 
+  processFrame, findMatchingDetection, getDetectionInterval, recordFrameTiming 
+} from './detect.js';
 import { 
   createBoxElement, updateExistingBoxElement,
   updateDetectionStats, removeStats, showError, hideError,
   updateButtonState, getBoxElements, resetBoxElements
 } from './ui.js';
+import * as tf from '@tensorflow/tfjs';
 
 /**
  * Global state variables
@@ -22,6 +25,7 @@ let previousDetections = [];    // Previous frame's detections for tracking
 let wasRunningBeforeHidden = false; // Track if detection was running before tab became hidden
 let modelInferenceCount = 0; // Count of model inferences for performance tracking
 let lastModelCountTime = performance.now(); // Timestamp for last model FPS count
+let processingTimes = []; // Track last few processing times for display
 
 /**
  * Initialize the application when DOM is fully loaded
@@ -29,6 +33,19 @@ let lastModelCountTime = performance.now(); // Timestamp for last model FPS coun
 document.addEventListener("DOMContentLoaded", () => {
   // Initialize video element reference
   videoElement = document.getElementById("video");
+  
+  // Log the backend being used
+  console.log("TensorFlow.js backend:", tf.getBackend());
+  
+  // Force WebGL backend if not already selected
+  if (tf.getBackend() !== 'webgl') {
+    console.log("Trying to switch to WebGL backend...");
+    tf.setBackend('webgl').then(() => {
+      console.log("Now using backend:", tf.getBackend());
+    }).catch(err => {
+      console.error("Failed to use WebGL backend:", err);
+    });
+  }
   
   // Set up event listeners for UI controls
   document.getElementById("shareScreen").addEventListener("click", startScreenCapture);
@@ -209,18 +226,36 @@ async function detectionLoop(timestamp) {
   lastDetectionTime = timestamp;
   
   try {
+    // Measure frame processing time
+    const frameStartTime = performance.now();
+    
     // Process current frame through TensorFlow model
     const { processedDetections, paddingInfo } = await processFrame(videoElement);
+    
+    // Calculate processing time and record for adaptive throttling
+    const processingTime = performance.now() - frameStartTime;
+    recordFrameTiming(processingTime);
+    
+    // Log processing time for debugging
+    console.log(`Frame processing time: ${processingTime.toFixed(1)} ms, Adaptive interval: ${getDetectionInterval().toFixed(1)} ms`);
+    
+    // Track last few processing times for display
+    processingTimes.push(processingTime);
+    if (processingTimes.length > 30) processingTimes.shift();
     
     modelInferenceCount++;
     const now = performance.now();
     if (now - lastModelCountTime >= 1000) {
       console.log("YOLO inference FPS:", modelInferenceCount);
       
+      // Calculate average processing time
+      const avgProcessingTime = processingTimes.length > 0 ? 
+        processingTimes.reduce((sum, time) => sum + time, 0) / processingTimes.length : 0;
+      
       // Check if element exists before updating
       const fpsElement = document.getElementById("modelFps");
       if (fpsElement) {
-        fpsElement.textContent = `${modelInferenceCount} model FPS`;
+        fpsElement.textContent = `${modelInferenceCount} FPS | ${avgProcessingTime.toFixed(0)} ms`;
       }
       
       modelInferenceCount = 0;

@@ -1,8 +1,12 @@
 import * as tf from '@tensorflow/tfjs';
 import { getModel, getClassNames } from './model.js';
 
-// Base detection interval in milliseconds
-let DETECTION_INTERVAL = 300;
+// Throttling configuration
+let DETECTION_INTERVAL = 200;  // Initial/fallback value
+const MIN_INTERVAL = 0;        // Minimum interval (0 = unlimited)
+const MAX_INTERVAL = 500;      // Maximum interval (throttle floor)
+let frameTimings = [];         // Store recent frame times
+const MAX_SAMPLES = 10;        // Number of samples to average
 
 /**
  * Returns a dynamically calculated detection interval
@@ -10,7 +14,36 @@ let DETECTION_INTERVAL = 300;
  * @returns {number} Adaptive interval between detections in milliseconds
  */
 export function getDetectionInterval() {
-  return DETECTION_INTERVAL
+  // If we have timing data, calculate adaptive interval
+  if (frameTimings.length >= 5) {
+    // Calculate average processing time
+    const avgTime = frameTimings.reduce((sum, time) => sum + time, 0) / frameTimings.length;
+    
+    // Set target to be slightly above average processing time
+    // This prevents queueing frames faster than they can be processed
+    let adaptiveInterval = avgTime * 1.2;
+    
+    // Clamp to reasonable range
+    adaptiveInterval = Math.max(MIN_INTERVAL, Math.min(MAX_INTERVAL, adaptiveInterval));
+    
+    return adaptiveInterval;
+  }
+  
+  // Fallback to default if not enough samples
+  return DETECTION_INTERVAL;
+}
+
+/**
+ * Record a frame processing time
+ * @param {number} time - Processing time in milliseconds
+ */
+export function recordFrameTiming(time) {
+  frameTimings.push(time);
+  
+  // Keep array at reasonable size
+  if (frameTimings.length > MAX_SAMPLES) {
+    frameTimings.shift(); // Remove oldest
+  }
 }
 
 /**
@@ -125,8 +158,8 @@ export async function processFrame(videoElement) {
         });
         
         // Apply non-maximum suppression to filter overlapping boxes
-        const confidenceThreshold = 0.45;  // Minimum confidence score
-        const iouThreshold = 0.2;          // Intersection over Union threshold
+        const confidenceThreshold = 0.4;  // Minimum confidence score
+        const iouThreshold = 0.45;          // Intersection over Union threshold
         nms = await tf.image.nonMaxSuppressionAsync(
           boxes, scores, 100, confidenceThreshold, iouThreshold
         );
